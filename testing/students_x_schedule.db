@@ -1,0 +1,15 @@
+SID,Lastname,Firstname,CCN,Num,Dept,Sem,Year
+101,Knowles,Jason,21105,54,Math,S,2004
+106,Chan,Yangfan,21231,61A,EECS,S,2004
+101,Knowles,Jason,21005,1A,English,S,2004
+106,Chan,Yangfan,21232,61B,EECS,S,2004
+105,Brown,Shana,21001,1A,English,F,2003
+106,Chan,Yangfan,21005,1A,English,S,2004
+104,Armstrong,Thomas,21005,1A,English,S,2004
+103,Xavier,Jonathan,21103,54,Math,F,2003
+105,Brown,Shana,21103,54,Math,F,2003
+103,Xavier,Jonathan,21001,1A,English,F,2003
+103,Xavier,Jonathan,21229,61B,EECS,F,2003
+106,Chan,Yangfan,21105,54,Math,S,2004
+104,Armstrong,Thomas,21105,54,Math,S,2004
+103,Xavier,Jonathan,21228,61A,EECS,F,2003

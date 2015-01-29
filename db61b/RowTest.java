@@ -1,0 +1,28 @@
+package db61b;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class RowTest {
+    Row r = new Row(new String[]{"Josh", "is", "a", "baller"});
+    @Test
+    public void testSize() {
+        assertEquals(4, r.size());
+    }
+
+    @Test
+    public void testGet() {
+        assertEquals("Josh", r.get(0));
+        assertEquals("baller", r.get(3));
+    }
+
+    @Test
+    public void testEquals() {
+        Row test = new Row(new String[]{"Josh", "is", "a", "baller"});
+        assertTrue(r.equals(test));
+
+        Row test1 = new Row(new String[] {"Hilfinger", "is", "a", "baller"});
+        assertTrue(!(r.equals(test1)));
+    }
+}

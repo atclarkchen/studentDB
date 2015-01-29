@@ -1,0 +1,329 @@
+package db61b;
+
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+
+public class TableTest {
+
+	@Test
+	public void testBasics() {
+		//testing constructor(takes in String[])
+		/*String[] colTitles = new String[]{"a", "a", "c", "d"};
+		Table t = new Table(colTitles); //should throw error at duplicate*/
+		String[] colTitles = new String[]{"a", "b", "c", "d"};
+		Table t = new Table(colTitles);
+		
+		//testing constructor(takes in List<String>
+		ArrayList<String> lst = new ArrayList<String>();
+		lst.add("cat");
+		lst.add("dog");
+		lst.add("mouse");
+		Table t1 = new Table(lst);
+		
+		//testing columns() --> returns size
+		assertEquals(4, t.columns());
+		assertEquals(3, t1.columns());
+		
+		//testing getTitle(k)
+		assertEquals("a", t.getTitle(0));
+		assertEquals("d", t.getTitle(3));
+		assertEquals("cat", t1.getTitle(0));
+		assertEquals("dog", t1.getTitle(1));
+		
+		//testing findColumn(String s) returns number of column
+		assertEquals(1, t.findColumn("b"));
+		assertEquals(3, t.findColumn("d"));
+		assertEquals(2, t1.findColumn("mouse"));
+		assertEquals(0, t1.findColumn("cat"));
+		
+		//testing row operations
+		//testing add(row) and size() which returns number of rows in the table
+		Row toAdd = new Row(new String[]{"Clark", "Maharbiz", "dog", "cat", "sex"});//constructor 1, takes in String[]
+		//note table t has columnTitles of length 4, so trying to add Row toAdd to "T" should return false
+		assertEquals(false, t.add(toAdd));
+		Row toAdd1 = new Row(new String[]{"Clark", "Maharbiz", "dog", "cat"});
+		assertEquals(true, t.add(toAdd1));
+	}
+	
+
+	/**
+	 * readTable(String name) reads the contents of name.db and returns it as a table
+	 */
+
+	Table t = Table.readTable("enrolled");
+	@Test
+	public void testReadTable() {
+		assertEquals(t.getTitle(0), "SID");
+		assertEquals(t.getTitle(2), "Grade");
+		assertEquals(t.size(), 19);//number of rows not including column titles
+		assertEquals(t.findColumn("CCN"), 1);
+		//try to do readTable with a file that doesn't exist
+		boolean fileNotExist = false;
+		try {
+			Table t1 = Table.readTable("unicorns");
+		} catch(DBException e) {
+			fileNotExist = true;
+		}
+		assertTrue(fileNotExist);
+	}
+	
+	/**
+	 * Writes the content of the Table (this) into Name.db.
+	 */
+	@Test
+	public void testWriteTable() {
+		//System.out.println("testing enroll Write Table");//t is from Table.readTable("enrolled")
+		t.writeTable("enrollWT");	
+		
+		//System.out.println();
+		Table t1 = Table.readTable("students");
+		//System.out.println("testing students Write Table...");
+		t1.writeTable("studentsWT");
+	}
+	
+	@Test
+	public void testPrintTable() {
+		Table t = new Table(new String[]{"Name", "Surname", "Grade"});
+        Row a = new Row(new String[]{"Jason", "Knowles", "B"});
+        Row b = new Row(new String[]{"Shana", "Brown", "B+"});
+        Row c = new Row(new String[]{"Yangfan", "Chan", "B"});
+        Row d = new Row(new String[]{"Valerie", "Chan", "B+"});
+        t.add(a);
+        t.add(b);
+        t.add(c);
+        t.add(d);
+        //System.out.println("testing Table Print()...");
+        //t.print();
+        //System.out.println();
+        Table t1 = Table.readTable("students");
+        //t1.print();
+	}
+	
+	@Test
+	public void testOneTableSelect() {
+		Table t = Table.readTable("students");
+		ArrayList<String> columns = new ArrayList<String>();
+		
+		/**TEST 1 (PASSED)
+		 * testing no condition select with multiple columns (PASSED)
+		 */
+		System.out.println("TEST 1");
+		System.out.println("testing no condition select with multiple columns...");
+		columns.add("SID");
+		columns.add("Major");
+		Table tSelect = t.select(columns, null);
+		
+		Table tExp = new Table(new String[]{"SID", "Major"});
+		Row r1 = new Row(new String[]{"101", "EECS"});
+		Row r2 = new Row(new String[]{"104", "EECS"});
+		Row r3 = new Row(new String[]{"102", "Math"});
+		Row r4 = new Row(new String[]{"106", "LSUnd"});
+		Row r5 = new Row(new String[]{"103", "LSUnd"});
+		Row r6 = new Row(new String[]{"105", "EECS"});
+		tExp.add(r1);
+		tExp.add(r2);
+		tExp.add(r3);
+		tExp.add(r4);
+		tExp.add(r5);
+		tExp.add(r6);
+		
+		System.out.println("Expected table is: ");
+		tExp.print();
+		System.out.println("Actual table is: ");
+		tSelect.print();
+		System.out.println();
+		
+
+		
+		/** TEST 2 (PASSED)
+		 * testing one condition select with columns (condition is TYPE2: COL1 RELATION VAL2)
+		 */
+		System.out.println("TEST 2");
+		System.out.println("testing 1 condition select with 1 Condition Type 2...");
+		
+			//make a condition. can either use Condition constructor or use commandInterpreter
+			//recall: t is a table that represents "students"db file
+			
+			/*Specific Example: > select SID, Firstname from students
+			where Lastname = ’Chan’;
+			Search results:
+				102 Valerie
+				106 Yangfan */
+		Table expected = new Table(new String[]{"SID", "Firstname"});
+		Row rr1 = new Row(new String[]{"102", "Valerie"});
+		Row rr2 = new Row(new String[]{"106", "Yangfan"});
+		expected.add(rr1);
+		expected.add(rr2);
+		System.out.println("Expected table is: ");
+		expected.print();
+		
+		Column col1 = new Column("Lastname", t);
+		String relation = "=";
+		String val1 = "Chan";
+		Condition c = new Condition(col1, relation, val1);
+		
+		ArrayList<Condition> conditions = new ArrayList<Condition>();
+		conditions.add(c);
+		
+		ArrayList<String> columnNames = new ArrayList<String>();
+		columnNames.add("SID");
+		columnNames.add("Firstname");
+		Table tSelect1 = t.select(columnNames, conditions);
+		System.out.println("Actual table is: ");
+		tSelect1.print();
+		
+		/** TEST 3
+		 * Testing 1 condition select with 1 Condition Type 1
+		 * Example: select SID from students where FirstName > LastName (if firstname comes after lastname, alphabetically)
+		 * 	Output should be: 102 104 105 106
+		 */
+		System.out.println();
+		System.out.println("TEST 3");
+		
+		Table exp2 = new Table(new String[]{"SID"});
+		Row rrr1 = new Row(new String[]{"102"});
+		Row rrr2 = new Row(new String[]{"104"});
+		Row rr3 = new Row(new String[]{"105"});
+		Row rr4 = new Row(new String[]{"106"});
+		exp2.add(rrr1);
+		exp2.add(rrr2);
+		exp2.add(rr3);
+		exp2.add(rr4);
+		
+		System.out.println("Testing 1 condition select with 1 Condition Type 2");
+		ArrayList<Condition> conditions1 = new ArrayList<Condition>();
+		Column col2 = new Column("Lastname", t);
+		Column coll1 = new Column("Firstname", t);
+		String rel = ">";
+		Condition c1 = new Condition(coll1, rel, col2);
+		conditions1.add(c1);
+		ArrayList<String> colNames = new ArrayList<String>();
+		colNames.add("SID");
+		Table tSelect2 = t.select(colNames, conditions1);
+		
+		System.out.println("Expected table is:");
+		exp2.print();
+		
+		System.out.println("Actual table is: ");
+		tSelect2.print();
+		
+		/** TEST 4
+		 * (PASSED)
+		 * Testing 2 conditions select with One Table
+		 * Condition type 2
+		 * Example:
+		 * Select SID, Lastname from students where YearEnter = 2003 and Major = EECS
+		 * 		Expected Table:
+		 * 			101 Knowles
+		 * 			104 Armstrong
+		 */
+		System.out.println("TEST 4");
+		System.out.println("testing 2 conditions select with SINGLE table...");
+		Table exp3 = new Table(new String[]{"SID", "Lastname"});
+		Row rrrr1 = new Row(new String[]{"101", "Knowles"});
+		Row rrrr2 = new Row(new String[]{"104", "Armstrong"});
+		exp3.add(rrrr1);
+		exp3.add(rrrr2);
+		System.out.println("Expected table is: ");
+		exp3.print();
+		
+		colNames = new ArrayList<String>();
+		colNames.add("SID");
+		colNames.add("Lastname");
+		
+		Column coL1A = new Column("YearEnter", t);
+		String vaL1 = "2003";
+		String reL = "=";
+		Condition cond1 = new Condition(coL1A, reL, vaL1);// Condition(YearEnter, = , '2003')
+		
+		Column coL2 = new Column("Major", t);
+		String vaL2 = "EECS";
+		Condition cond2 = new Condition(coL2, reL, vaL2);// Condition(Major, = , 'EECS')
+		
+		ArrayList<Condition> conds = new ArrayList<Condition>();
+		conds.add(cond1);
+		conds.add(cond2);
+		Table tSelect4 = t.select(colNames, conds);
+		System.out.println("Actual table is: ");
+		tSelect4.print();
+	}
+	@Test
+	public void testTwoTableSelect() {
+
+		System.out.println("Testing Two Table Select...");
+		Table t1 = Table.readTable("students");
+		Table t2 = Table.readTable("enrolled");
+	/** Test 1
+	 *  Select 3 COLUMNs from 2 TABLES with NO CONDITIONS.
+	 */
+		System.out.println();
+		System.out.println("TEST 1");
+		
+		//make columns with ColumnNames
+		List<String> colnames = new ArrayList<String>();
+		colnames.add("Firstname");
+		colnames.add("Lastname");
+		colnames.add("Grade");
+		
+		
+		//actual
+		ArrayList<Condition> conditions = new ArrayList<Condition>();
+		
+		Table t1actual = t1.select(t2, colnames, conditions);
+		t1actual.print();
+		
+	/** Test 2
+	 * Select 3 COLUMNS from 2 TABLES with 1 CONDITION.
+	 */
+		
+	/* Example:
+	 * > select Firstname, Lastname, Grade
+		from students, enrolled where CCN = ’21001’;
+	 */
+		System.out.println("TEST 2");
+
+
+		
+		//expected Table
+		/*Search results:
+			Jason Knowles B
+			Shana Brown B+
+			Yangfan Chan B
+			Valerie Chan B+ */
+		
+		Table exp = new Table(new String[]{"Firstname", "Lastname", "Grade"});
+		Row r1 = new Row(new String[]{"Jason", "Knowles", "B"});
+		Row r2 = new Row(new String[]{"Shana", "Brown", "B+"});
+		Row r3 = new Row(new String[]{"Yangfan", "Chan", "B"});
+		Row r4 = new Row(new String[]{"Valerie", "Chan", "B+"});
+		exp.add(r1); exp.add(r2); exp.add(r3); exp.add(r4);
+		
+		System.out.println("Expected Table is: ");
+		exp.print();		
+		
+		//actual
+		
+			//make condition
+		Column col1 = new Column("CCN", t1, t2);
+		String val2 = "21001";
+		String relation = "=";
+		
+		Condition cond1 = new Condition(col1, relation, val2);
+		ArrayList<Condition> conds = new ArrayList<Condition>();
+		conds.add(cond1);
+		Table actual = t1.select(t2, colnames, conds);
+		
+		System.out.println("Actual Table is: ");
+		actual.print();
+		
+	}
+	
+	public static void main(String[] args) {
+		System.exit(ucb.junit.textui.runClasses(TableTest.class));
+	}
+
+}

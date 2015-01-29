@@ -1,0 +1,25 @@
+load students;
+
+select SID from students where Lastname = 'Chan';
+select SID from students where Lastname != 'Chan';
+select SID from students where Lastname < 'Chan';
+select SID from students where Lastname <= 'Chan';
+select SID from students where Lastname > 'Chan';
+select SID from students where Lastname >= 'Chan';
+
+select SID from students where Lastname > Firstname;
+
+select SID from students where Lastname = 'Chan';
+select SID from students where Lastname != 'Chan';
+select SID from students where Lastname < 'Chan';
+select SID from students where Lastname <= 'Chan';
+select SID from students where Lastname > 'Chan';
+select SID from students where Lastname >= 'Chan';
+
+select SID from students where Lastname > Firstname;
+
+select SID from students where Lastname > 'Brown' and Lastname < 'Xavier';
+
+quit;
+
+//borrowed from autograder

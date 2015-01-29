@@ -1,0 +1,14 @@
+package db61b;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class CommandInterpreterTest {
+
+	@Test
+	public void testPrint() {
+		
+	}
+
+}

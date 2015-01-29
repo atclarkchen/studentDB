@@ -1,0 +1,13 @@
+load students;
+load enrolled;
+load schedule;
+create table students_x_schedule as select SID, Lastname, Firstname, CCN, Num, Dept, Sem, Year from students, schedule;
+
+ 
+create table students_x_courses as select SID, Lastname, Firstname, Num, Dept, Sem, Year, Grade from students_x_schedule, enrolled;
+
+
+select Lastname, Firstname, Num, Dept, Sem, Year, Grade from students_x_courses;
+
+quit;
+ //borrowed from autograder
